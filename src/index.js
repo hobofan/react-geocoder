@@ -73,6 +73,8 @@ class Geocoder extends Component {
         this.props.proximity,
         this.props.bbox,
         this.props.types,
+        this.props.country,
+        this.props.language,
         value,
         this.onResult
       );
@@ -164,6 +166,8 @@ Geocoder.defaultProps = {
   proximity: '',
   bbox: '',
   types: '',
+  country: '',
+  language: '',
   onSuggest: function() {},
   focusOnMount: true
 };
@@ -184,7 +188,9 @@ Geocoder.propTypes = {
   bbox: PropTypes.string,
   showLoader: PropTypes.bool,
   focusOnMount: PropTypes.bool,
-  types: PropTypes.string
+  types: PropTypes.string,
+  country: PropTypes.string,
+  language: PropTypes.string
 };
 
 export default Geocoder;
