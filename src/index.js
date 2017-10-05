@@ -118,8 +118,13 @@ class Geocoder extends Component {
   }
 
   render () {
+    let InputComponentClass = 'input';
+    if (this.props.inputComponentClass) {
+      InputComponentClass = this.props.inputComponentClass;
+    }
+
     var input = (
-      <input
+      <InputComponentClass
         ref='input'
         className={this.props.inputClass}
         onInput={this.onInput}
@@ -178,8 +183,9 @@ Geocoder.propTypes = {
   inputClass: PropTypes.string,
   resultClass: PropTypes.string,
   resultsClass: PropTypes.string,
-  inputPosition: PropTypes.string,
+  inputComponentClass: PropTypes.func,
   inputPlaceholder: PropTypes.string,
+  inputPosition: PropTypes.string,
   resultFocusClass: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
   onSuggest: PropTypes.func,
