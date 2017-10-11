@@ -12,11 +12,14 @@ class Geocoder extends Component {
 
     this.state = {
       results: [],
+      inputValue: '',
+      isInputFocused: false,
       focus: null,
       loading: false,
       searchTime: new Date()
     };
 
+    this.onFocusChange = this.onFocusChange.bind(this);
     this.onInput = this.onInput.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onResult = this.onResult.bind(this);
@@ -25,6 +28,15 @@ class Geocoder extends Component {
   componentDidMount () {
     if (this.props.focusOnMount) {
       ReactDOM.findDOMNode(this.refs.input).focus();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const isInputFocused = this.refs.input && document.activeElement === ReactDOM.findDOMNode(this.refs.input).getElementsByClassName('input')[0];
+    if (isInputFocused !== prevState.isInputFocused) {
+      this.setState({
+        isInputFocused,
+      });
     }
   }
 
@@ -42,23 +54,34 @@ class Geocoder extends Component {
 
   acceptFocus () {
     if (this.state.focus !== null) {
-      this.props.onSelect(this.state.results[this.state.focus]);
+      const place = this.state.results[this.state.focus];
+      this.props.onSelect(place);
+      this.setState({inputValue: place.place_name});
     }
   }
 
   clickOption (place, listLocation) {
-    this.props.onSelect(place);
-    this.setState({focus:listLocation});
+    this.setState({
+      focus:listLocation,
+      inputValue: place.place_name
+    }, () => this.props.onSelect(place));
     // focus on the input after click to maintain key traversal
     ReactDOM.findDOMNode(this.refs.input).focus();
     return false;
   }
 
+  onFocusChange (focused) {
+    setTimeout(() => {
+      this.setState({
+        isInputFocused: focused,
+      });
+    }, 100);
+  }
+
   onInput (e) {
-    this.setState({loading:true});
+    this.setState({loading:true, inputValue: value});
 
     const { value } = e.target;
-
     if (value === '') {
       this.setState({
         results: [],
@@ -125,32 +148,34 @@ class Geocoder extends Component {
 
     var input = (
       <InputComponentClass
-        ref='input'
+        value={this.state.inputValue}
+        ref="input"
         className={this.props.inputClass}
+        onFocusChange={this.onFocusChange}
         onInput={this.onInput}
         onKeyDown={this.onKeyDown}
         placeholder={this.props.inputPlaceholder}
-        type='text'
+        type="text"
       />
     );
 
     return (
       <div>
         {this.props.inputPosition === 'top' && input}
-        {this.state.results.length > 0 && (
-          <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} ${this.props.resultsClass}`}>
-            {this.state.results.map((result, i) => (
-              <li key={result.id}>
-                <a href='#'
-                  onClick={this.clickOption.bind(this, result, i)}
-                  className={this.props.resultClass + ' ' + (i === this.state.focus ? this.props.resultFocusClass : '')}
-                  key={result.id}
-                >
-                  {result.place_name}
-                </a>
-              </li>
-            ))}
-          </ul>
+        {this.state.results.length > 0 && this.state.isInputFocused && (
+           <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} ${this.props.resultsClass}`}>
+             {this.state.results.map((result, i) => (
+               <li key={result.id}>
+                 <a href='#'
+                    onClick={this.clickOption.bind(this, result, i)}
+                    className={this.props.resultClass + ' ' + (i === this.state.focus ? this.props.resultFocusClass : '')}
+                    key={result.id}
+                 >
+                   {result.place_name}
+                 </a>
+               </li>
+             ))}
+           </ul>
         )}
         {this.props.inputPosition === 'bottom' && input}
       </div>
