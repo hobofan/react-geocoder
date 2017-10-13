@@ -88,6 +88,7 @@ class Geocoder extends Component {
         focus: null,
         loading:false
       });
+      this.props.onSelect();
     } else {
       search(
         this.props.endpoint,
